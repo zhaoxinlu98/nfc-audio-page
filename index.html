@@ -257,11 +257,13 @@
 <header>极速小鱼</header>
 <div id="player" class="controls" role="region" aria-label="音频播放器控制区">
   <button id="prev" aria-label="上一首" aria-pressed="false" style="background:none; border:none; cursor:pointer;">
-    <!-- 向左游动小鱼 -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 64 64" fill="#18B7F6" >
-      <path d="M44 12c-6 0-18 8-18 20s12 20 18 20c4 0 8-12 8-20s-4-20-8-20z" />
-      <circle cx="28" cy="32" r="6" fill="#fff"/>
-      <circle cx="28" cy="32" r="3" fill="#18B7F6"/>
+    <!-- 放大且更明显的向左游动小鱼 -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="#18B7F6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M45 20c-8 0-20 8-20 20 0 10 12 20 20 20 6 0 10-12 10-20 0-12-4-20-10-20z" fill="#18B7F6"/>
+      <circle cx="24" cy="32" r="10" fill="#D7EEF6"/>
+      <circle cx="24" cy="32" r="6" fill="#18B7F6"/>
+      <path d="M40 32l8-8" stroke="#fff" stroke-width="2"/>
+      <path d="M40 32l8 8" stroke="#fff" stroke-width="2"/>
     </svg>
   </button>
 
@@ -276,11 +278,13 @@
   </div>
 
   <button id="next" aria-label="下一首" aria-pressed="false" style="background:none; border:none; cursor:pointer;">
-    <!-- 向右游动小鱼 -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 64 64" fill="#18B7F6" >
-      <path d="M20 12c6 0 18 8 18 20s-12 20-18 20c-4 0-8-12-8-20s4-20 8-20z" />
-      <circle cx="36" cy="32" r="6" fill="#fff"/>
-      <circle cx="36" cy="32" r="3" fill="#18B7F6"/>
+    <!-- 放大且更明显的向右游动小鱼 -->
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none" stroke="#18B7F6" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M19 20c8 0 20 8 20 20 0 10-12 20-20 20-6 0-10-12-10-20 0-12 4-20 10-20z" fill="#18B7F6"/>
+      <circle cx="40" cy="32" r="10" fill="#D7EEF6"/>
+      <circle cx="40" cy="32" r="6" fill="#18B7F6"/>
+      <path d="M24 32l-8-8" stroke="#fff" stroke-width="2"/>
+      <path d="M24 32l-8 8" stroke="#fff" stroke-width="2"/>
     </svg>
   </button>
 
@@ -366,49 +370,61 @@
       tab.classList.add("active");
       tab.setAttribute("aria-selected", "true");
       tab.tabIndex = 0;
-      const tabPanel = document.getElementById(tab.dataset.tab);
-      tabPanel.classList.add("active");
-      tabPanel.hidden = false;
-
-      audio.pause();
-      audio.currentTime = 0;
-      audio.src = "";
-      nowPlaying.textContent = "未播放";
-      timeDisplay.textContent = "00:00 / 00:00";
-
-      const firstAudio = tabPanel.querySelector(".audio-item");
-      if (firstAudio) firstAudio.focus();
-
+      const target = document.getElementById(tab.dataset.tab);
+      target.classList.add("active");
+      target.hidden = false;
       currentIndex = -1;
+      nowPlaying.textContent = "未播放";
+      progress.value = 0;
+      timeDisplay.textContent = "00:00 / 00:00";
+      clearActiveItems();
+    });
+
+    tab.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const next = e.target.nextElementSibling || tabs[0];
+        next.focus();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const prev = e.target.previousElementSibling || tabs[tabs.length - 1];
+        prev.focus();
+      }
     });
   });
 
-  function playAudio(index) {
-    const items = document.querySelectorAll(".audio-list.active .audio-item");
-    if (items.length === 0) return;
-    if (index < 0) index = items.length - 1;
-    if (index >= items.length) index = 0;
-    items.forEach(i => i.classList.remove("active"));
-    const item = items[index];
-    item.classList.add("active");
-    const src = item.dataset.src;
-    nowPlaying.textContent = item.textContent;
-    audio.src = src;
-    audio.play();
-    currentIndex = index;
-    playPauseBtn.textContent = "⏸️";
+  function clearActiveItems() {
+    document.querySelectorAll(".audio-item.active").forEach(item => {
+      item.classList.remove("active");
+    });
   }
 
-  document.querySelectorAll(".audio-item").forEach((item, i) => {
-    item.addEventListener("click", () => {
-      const items = document.querySelectorAll(".audio-list.active .audio-item");
-      const idx = Array.from(items).indexOf(item);
-      playAudio(idx);
-    });
+  function getCurrentListItems() {
+    return document.querySelectorAll(".audio-list.active .audio-item");
+  }
+
+  function playAudio(index) {
+    const items = getCurrentListItems();
+    if (index < 0) index = items.length - 1;
+    if (index >= items.length) index = 0;
+    currentIndex = index;
+    const item = items[currentIndex];
+    const src = item.dataset.src.trim();
+    audio.src = src;
+    audio.play();
+    clearActiveItems();
+    item.classList.add("active");
+    nowPlaying.textContent = item.textContent;
+    playPauseBtn.textContent = "⏸️";
+    playPauseBtn.setAttribute("aria-label", "暂停");
+  }
+
+  getCurrentListItems().forEach((item, i) => {
+    item.addEventListener("click", () => playAudio(i));
     item.addEventListener("keydown", e => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        item.click();
+        e.target.click();
       }
     });
   });
@@ -417,9 +433,11 @@
     if (audio.paused) {
       audio.play();
       playPauseBtn.textContent = "⏸️";
+      playPauseBtn.setAttribute("aria-label", "暂停");
     } else {
       audio.pause();
       playPauseBtn.textContent = "▶️";
+      playPauseBtn.setAttribute("aria-label", "播放");
     }
   });
 
@@ -432,7 +450,7 @@
   });
 
   randomBtn.addEventListener("click", () => {
-    const items = document.querySelectorAll(".audio-list.active .audio-item");
+    const items = getCurrentListItems();
     if (items.length === 0) return;
     const randomIndex = Math.floor(Math.random() * items.length);
     playAudio(randomIndex);

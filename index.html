@@ -19,9 +19,6 @@
     font-weight: 700;
     user-select: none;
     text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
   }
 
   .controls {
@@ -60,24 +57,26 @@
     flex: 1;
     margin: 0 20px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
   }
 
   #nowPlaying {
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-right: 12px;
     font-size: 18px;
     color: #333;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 180px;
   }
 
   #progress {
-    width: 100%;
+    flex-grow: 1;
     -webkit-appearance: none;
     appearance: none;
-    height: 12px;
+    height: 6px;
     border-radius: 4px;
     background: #d0d0d0;
     outline: none;
@@ -88,8 +87,8 @@
   #progress::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #666BCE;
     cursor: pointer;
@@ -98,8 +97,8 @@
   }
 
   #progress::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #666BCE;
     cursor: pointer;
@@ -117,9 +116,21 @@
   #time {
     font-size: 13px;
     color: #666;
-    margin-top: 6px;
-    text-align: right;
+    margin-left: 12px;
     user-select: none;
+    white-space: nowrap;
+    min-width: 70px;
+    text-align: right;
+  }
+
+  #playModeDisplay {
+    font-size: 13px;
+    color: #666;
+    margin-left: 12px;
+    user-select: none;
+    white-space: nowrap;
+    min-width: 70px;
+    text-align: right;
   }
 
   main {
@@ -169,8 +180,6 @@
     list-style: none;
     padding-left: 0;
     margin: 0;
-    max-height: 360px;
-    overflow-y: auto;
   }
 
   .audio-list.active {
@@ -217,26 +226,21 @@
     }
     #nowPlaying {
       font-size: 14px;
-      max-width: 120px;
+      max-width: 100px;
+      margin-right: 6px;
     }
-    .progress-container {
-      margin: 0 8px;
+    #time, #playModeDisplay {
+      font-size: 12px;
+      min-width: 60px;
+      margin-left: 8px;
+    }
+    #progress {
+      height: 8px;
     }
     #tabs button {
       padding: 10px 18px;
       margin: 0 8px;
       font-size: 14px;
-    }
-    #progress {
-      height: 16px;
-    }
-    #progress::-webkit-slider-thumb {
-      width: 28px;
-      height: 28px;
-    }
-    #progress::-moz-range-thumb {
-      width: 28px;
-      height: 28px;
     }
   }
 </style>
@@ -251,9 +255,10 @@
     <div id="nowPlaying" aria-live="polite" aria-atomic="true" aria-owns="progress">未播放</div>
     <input type="range" id="progress" value="0" aria-label="播放进度" tabindex="0" />
     <div id="time" aria-live="polite" aria-atomic="true">00:00 / 00:00</div>
+    <div id="playModeDisplay" aria-live="polite" aria-atomic="true">单次播放</div>
   </div>
   <button id="next" aria-label="下一首" aria-pressed="false" class="icon-btn" tabindex="0">➡️</button>
-  <button id="loopBtn" aria-label="播放模式" class="icon-btn" tabindex="0">⏹️</button>
+  <button id="loopBtn" aria-label="播放模式：单次播放" class="icon-btn" tabindex="0">⏹️</button>
 </div>
 
 <main>
@@ -264,33 +269,33 @@
   </div>
 
   <ul id="gulu" class="audio-list active" role="tabpanel" tabindex="0">
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/buyaohaipaikunnan.mp3">不要害怕困难</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/dongrizhufu.mp3">冬日祝福</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/ge-ye-xihuan-ni.mp3">哥也喜欢你</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/cuini_rushui.mp3">催你入睡</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiedianhua.mp3">接电话</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiejie.mp3">姐姐</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/meimei-wanan.mp3">妹妹晚安</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/taiyangshai_pigu.mp3">太阳晒屁股</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/qichuang_naoling_shengri.mp3">起床闹铃（生日版）</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/sajiaobalian.mp3">撒娇八连</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/shengri_duxin.mp3">生日读信</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/women_haohui_zai_jian_men.mp3">我们还会再见面的</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiejie_zaodian_shuijiao_ba.mp3">姐姐早点睡觉吧</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/xin_de_yinian_xiwang.mp3">新的一年希望明年要比今年更开心一点</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/zaijianchi_yixia_rensheng_gaoguang.mp3">再坚持一下我的人生高光就来了</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/mama_wanan.mp3">妈妈晚安</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="buyaohaipaikunnan.mp3">不要害怕困难</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="dongrizhufu.mp3">冬日祝福</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="ge-ye-xihuan-ni.mp3">哥也喜欢你</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="cuini_rushui.mp3">催你入睡</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="jiedianhua.mp3">接电话</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="jiejie.mp3">姐姐</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="meimei-wanan .mp3">妹妹晚安</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="taiyangshai_pigu.mp3">太阳晒屁股</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="qichuang_naoling_shengri.mp3">起床闹铃（生日版）</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="sajiaobalian.mp3">撒娇八连</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="shengri_duxin.mp3">生日读信</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="women_haohui_zai_jian_men.mp3">我们还会再见面的</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="jiejie_zaodian_shuijiao_ba.mp3">姐姐早点睡觉吧</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="xin_de_yinian_xiwang.mp3">新的一年希望明年要比今年更开心一点</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="zaijianchi_yixia_rensheng_gaoguang.mp3">再坚持一下我的人生高光就来了</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="mama_wanan.mp3">妈妈晚安</li>
   </ul>
 
   <ul id="changge" class="audio-list" role="tabpanel" tabindex="0" hidden>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/siyishenghua_live.mp3">肆意生花片段（直播版）</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/tebie_de_ren.mp3">特别的人</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/tuheisu.mp3">褪黑素</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="siyishenghua_live.mp3">肆意生花片段（直播版）</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="tebie_de_ren.mp3">特别的人</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="tuheisu.mp3">褪黑素</li>
   </ul>
 
   <ul id="jiangshu" class="audio-list" role="tabpanel" tabindex="0" hidden>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/xiaoshuimian.mp3">小睡眠</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="audios/xiaoyu_youdao_dahaili_le_ma.mp3">小鱼游到大海里了吗</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="xiaoshuimian.mp3">小睡眠</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="xiaoyu_youdao_dahaili_le_ma.mp3">小鱼游到大海里了吗</li>
   </ul>
 </main>
 
@@ -303,15 +308,17 @@
   const nowPlaying = document.getElementById("nowPlaying");
   const progress = document.getElementById("progress");
   const timeDisplay = document.getElementById("time");
+  const playModeDisplay = document.getElementById("playModeDisplay");
   const playPauseBtn = document.getElementById("playPause");
   const prevBtn = document.getElementById("prev");
   const nextBtn = document.getElementById("next");
   const loopBtn = document.getElementById("loopBtn");
 
   let currentIndex = -1;
-  let playMode = 0; // 0=单次，1=列表，2=循环
-  const playModeIcons = ['⏹️', '📃', '🔁'];
-  const playModeTitles = ['播放模式：单次播放', '播放模式：列表播放', '播放模式：循环播放'];
+  // 0: 单次播放，1: 列表播放，2: 循环播放
+  let playMode = 0;
+  const playModeIcons = ["⏹️", "📃", "🔁"];
+  const playModeTitles = ["播放模式：单次播放", "播放模式：列表播放", "播放模式：循环播放"];
 
   // 切换标签
   tabs.forEach(tab => {
@@ -430,11 +437,17 @@
     playAudio(currentIndex + 1);
   });
 
-  // 播放模式切换按钮
-  loopBtn.addEventListener("click", () => {
-    playMode = (playMode + 1) % 3;
+  // 播放模式按钮（单次，列表，循环）
+  function updatePlayModeUI() {
     loopBtn.textContent = playModeIcons[playMode];
     loopBtn.setAttribute("aria-label", playModeTitles[playMode]);
+    playModeDisplay.textContent = playModeTitles[playMode].replace("播放模式：", "");
+  }
+  updatePlayModeUI();
+
+  loopBtn.addEventListener("click", () => {
+    playMode = (playMode + 1) % 3;
+    updatePlayModeUI();
   });
 
   // 播放进度更新
@@ -451,32 +464,24 @@
     audio.currentTime = progress.value;
   });
 
-  // 自动播放下一首根据播放模式
+  // 自动播放下一首逻辑
   audio.addEventListener("ended", () => {
     if (playMode === 0) {
-      // 单次播放，播放完暂停
+      // 单次播放，播放结束暂停
       playPauseBtn.textContent = "▶️";
       playPauseBtn.setAttribute("aria-label", "播放");
-      clearActiveAudioItems();
-      nowPlaying.textContent = "未播放";
-      currentIndex = -1;
-      audio.src = "";
     } else if (playMode === 1) {
-      // 列表播放，播完下一首，播到末尾停
+      // 列表播放，播放下一首，末尾停止
       const currentList = document.querySelector(".audio-list.active");
       const items = currentList.querySelectorAll(".audio-item");
-      if (currentIndex < items.length - 1) {
+      if (currentIndex < items.length -1) {
         playAudio(currentIndex + 1);
       } else {
         playPauseBtn.textContent = "▶️";
         playPauseBtn.setAttribute("aria-label", "播放");
-        clearActiveAudioItems();
-        nowPlaying.textContent = "未播放";
-        currentIndex = -1;
-        audio.src = "";
       }
-    } else {
-      // 循环播放
+    } else if (playMode === 2) {
+      // 循环播放，播放下一首，末尾循环
       playAudio(currentIndex + 1);
     }
   });
@@ -487,10 +492,6 @@
     const s = Math.floor(seconds % 60);
     return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
   }
-
-  // 初始化播放模式按钮
-  loopBtn.textContent = playModeIcons[playMode];
-  loopBtn.setAttribute("aria-label", playModeTitles[playMode]);
 
   bindListEvents();
 </script>

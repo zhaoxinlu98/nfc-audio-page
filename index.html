@@ -5,72 +5,119 @@
   <title>极速小鱼 - 音频空间</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg-color: #f0f0f0;
+      --text-color: #333;
+      --card-bg: #ffffffcc;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark {
+      --bg-color: #1a1a1a;
+      --text-color: #f5f5f5;
+      --card-bg: #2b2b2bcc;
+      --shadow: rgba(0, 0, 0, 0.5);
+    }
+
     body {
       margin: 0;
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      min-height: 100vh;
+      background: var(--bg-color);
+      color: var(--text-color);
       padding: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      transition: background 0.3s ease, color 0.3s ease;
     }
+
     h2 {
-      margin-bottom: 40px;
-      font-size: 2.5rem;
-      text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 30px;
     }
-    .audio-item {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 25px;
-      width: 320px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #888;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      color: #fff;
       cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 10px var(--shadow);
+      transition: background 0.3s ease;
     }
+
+    .theme-toggle:hover {
+      background: #555;
+    }
+
+    .audio-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px auto;
+      max-width: 360px;
+      box-shadow: 0 8px 16px var(--shadow);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
     .audio-item:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 12px 24px var(--shadow);
     }
+
     .audio-item p {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 10px;
     }
+
     audio {
       width: 100%;
-      outline: none;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <h2>🎵 极速小鱼 音频空间</h2>
+  <button class="theme-toggle" onclick="toggleTheme()">切换主题</button>
+  <h2>🎵 极速小鱼 · 音频空间</h2>
 
-  <div class="audio-item" tabindex="0">
+  <div class="audio-item">
     <p>🥺 哥也喜欢你</p>
     <audio controls>
       <source src="ge-ye-xihuan-ni.m4a" type="audio/mp4" />
-      您的浏览器不支持 audio 元素。
     </audio>
   </div>
 
-  <div class="audio-item" tabindex="0">
+  <div class="audio-item">
     <p>🌙 妹妹晚安</p>
     <audio controls>
       <source src="meimei-wanan.m4a" type="audio/mp4" />
     </audio>
   </div>
 
-  <div class="audio-item" tabindex="0">
+  <div class="audio-item">
     <p>🌞 起床晒屁股啦！</p>
     <audio controls>
       <source src="qichuang-shai-pigu.m4a" type="audio/mp4" />
     </audio>
   </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    // 初始化主题
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.body.classList.add('dark');
+      }
+    })();
+  </script>
 </body>
 </html>

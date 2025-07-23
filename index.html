@@ -2,29 +2,56 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>极速小鱼</title>
+  <title>极速小鱼 - 音频空间</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
-      background-color: #f7f7f7;
-    }
-    .audio-item {
-      margin-bottom: 30px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      min-height: 100vh;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     h2 {
-      color: #333;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    }
+    .audio-item {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      width: 320px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .audio-item:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .audio-item p {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    audio {
+      width: 100%;
+      outline: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <h2>🎵 极速小鱼</h2>
+  <h2>🎵 极速小鱼 音频空间</h2>
 
-  <div class="audio-item">
+  <div class="audio-item" tabindex="0">
     <p>🥺 哥也喜欢你</p>
     <audio controls>
       <source src="ge-ye-xihuan-ni.m4a" type="audio/mp4" />
@@ -32,14 +59,14 @@
     </audio>
   </div>
 
-  <div class="audio-item">
+  <div class="audio-item" tabindex="0">
     <p>🌙 妹妹晚安</p>
     <audio controls>
       <source src="meimei-wanan.m4a" type="audio/mp4" />
     </audio>
   </div>
 
-  <div class="audio-item">
+  <div class="audio-item" tabindex="0">
     <p>🌞 起床晒屁股啦！</p>
     <audio controls>
       <source src="qichuang-shai-pigu.m4a" type="audio/mp4" />

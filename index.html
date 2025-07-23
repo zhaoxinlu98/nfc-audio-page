@@ -247,7 +247,7 @@
 <body>
 <header>极速小鱼</header>
 <div id="player" class="controls" role="region" aria-label="音频播放器控制区">
-  <button id="prev" aria-label="上一首" aria-pressed="false" >
+  <button id="prev" aria-label="上一首" aria-pressed="false" style="background:none; border:none; cursor:pointer;">
     <!-- 向左游动小鱼 -->
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 64 64" fill="#18B7F6" >
       <path d="M44 12c-6 0-18 8-18 20s12 20 18 20c4 0 8-12 8-20s-4-20-8-20z" />
@@ -255,12 +255,18 @@
       <circle cx="28" cy="32" r="3" fill="#18B7F6"/>
     </svg>
   </button>
+
+  <button id="playPause" aria-label="播放/暂停" style="background:none; border:none; cursor:pointer; color:#18B7F6; font-size: 24px; user-select:none;">
+    ▶️
+  </button>
+
   <div class="progress-container">
     <div id="nowPlaying" aria-live="polite" aria-atomic="true" aria-owns="progress">未播放</div>
     <input type="range" id="progress" value="0" aria-label="播放进度" />
     <div id="time" aria-live="polite" aria-atomic="true">00:00 / 00:00</div>
   </div>
-  <button id="next" aria-label="下一首" aria-pressed="false" >
+
+  <button id="next" aria-label="下一首" aria-pressed="false" style="background:none; border:none; cursor:pointer;">
     <!-- 向右游动小鱼 -->
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 64 64" fill="#18B7F6" >
       <path d="M20 12c6 0 18 8 18 20s-12 20-18 20c-4 0-8-12-8-20s4-20 8-20z" />
@@ -268,7 +274,10 @@
       <circle cx="36" cy="32" r="3" fill="#18B7F6"/>
     </svg>
   </button>
-  <button id="random" aria-label="随机播放">🔀</button>
+
+  <button id="random" aria-label="随机播放" style="background:none; border:none; cursor:pointer; font-size: 20px; color:#18B7F6;">
+    🔀
+  </button>
 </div>
 
 <div id="tabs" role="tablist" aria-label="音频模块切换">
@@ -317,6 +326,7 @@
   const prevBtn = document.getElementById("prev");
   const nextBtn = document.getElementById("next");
   const randomBtn = document.getElementById("random");
+  const playPauseBtn = document.getElementById("playPause");
   const tabs = document.querySelectorAll(".tab");
   const lists = document.querySelectorAll(".audio-list");
   let currentIndex = -1;
@@ -360,6 +370,7 @@
 
   function playAudio(index) {
     const items = document.querySelectorAll(".audio-list.active .audio-item");
+    if (items.length === 0) return;
     if (index < 0) index = items.length - 1;
     if (index >= items.length) index = 0;
     items.forEach(i => i.classList.remove("active"));
@@ -370,6 +381,7 @@
     audio.src = src;
     audio.play();
     currentIndex = index;
+    playPauseBtn.textContent = "⏸️";
   }
 
   document.querySelectorAll(".audio-item").forEach(item => {
@@ -392,22 +404,4 @@
   nextBtn.onclick = () => playAudio(currentIndex + 1);
   randomBtn.onclick = () => {
     const items = document.querySelectorAll(".audio-list.active .audio-item");
-    const rand = Math.floor(Math.random() * items.length);
-    playAudio(rand);
-  };
-
-  audio.addEventListener("timeupdate", () => {
-    if (audio.duration) {
-      progress.value = (audio.currentTime / audio.duration) * 100;
-      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
-    }
-  });
-
-  progress.addEventListener("input", () => {
-    if (audio.duration) {
-      audio.currentTime = (progress.value / 100) * audio.duration;
-    }
-  });
-</script>
-</body>
-</html>
+    const

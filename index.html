@@ -19,13 +19,16 @@
     font-weight: 700;
     user-select: none;
     text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
   }
 
   .controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 12px;
+    padding: 12px 20px;
     background: #fff;
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     border-radius: 12px;
@@ -33,7 +36,7 @@
     top: 56px;
     z-index: 999;
     user-select: none;
-    margin: 8px 12px;
+    margin: 8px 16px;
   }
 
   /* 统一按钮样式 */
@@ -54,9 +57,8 @@
   }
 
   .progress-container {
-    flex: 1 1 auto;
-    margin: 0 8px;
-    min-width: 220px;
+    flex: 1;
+    margin: 0 20px;
     display: flex;
     flex-direction: column;
   }
@@ -75,8 +77,8 @@
     width: 100%;
     -webkit-appearance: none;
     appearance: none;
-    height: 10px;
-    border-radius: 5px;
+    height: 12px;
+    border-radius: 4px;
     background: #d0d0d0;
     outline: none;
     cursor: pointer;
@@ -93,7 +95,6 @@
     cursor: pointer;
     box-shadow: 0 0 8px #666BCE;
     transition: background-color 0.3s;
-    margin-top: -5px; /* 让圆点居中于轨道 */
   }
 
   #progress::-moz-range-thumb {
@@ -168,6 +169,8 @@
     list-style: none;
     padding-left: 0;
     margin: 0;
+    max-height: 360px;
+    overflow-y: auto;
   }
 
   .audio-list.active {
@@ -206,7 +209,7 @@
       flex-wrap: nowrap;
       gap: 8px;
       top: 56px;
-      margin: 8px 6px;
+      margin: 8px 8px;
     }
     .icon-btn {
       font-size: 22px;
@@ -217,16 +220,23 @@
       max-width: 120px;
     }
     .progress-container {
-      margin: 0 4px;
-      min-width: 280px;
-    }
-    #progress {
-      height: 16px;
+      margin: 0 8px;
     }
     #tabs button {
       padding: 10px 18px;
       margin: 0 8px;
       font-size: 14px;
+    }
+    #progress {
+      height: 16px;
+    }
+    #progress::-webkit-slider-thumb {
+      width: 28px;
+      height: 28px;
+    }
+    #progress::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
     }
   }
 </style>
@@ -243,7 +253,7 @@
     <div id="time" aria-live="polite" aria-atomic="true">00:00 / 00:00</div>
   </div>
   <button id="next" aria-label="下一首" aria-pressed="false" class="icon-btn" tabindex="0">➡️</button>
-  <button id="random" aria-label="随机播放" class="icon-btn" tabindex="0">🔀</button>
+  <button id="loopBtn" aria-label="播放模式" class="icon-btn" tabindex="0">⏹️</button>
 </div>
 
 <main>
@@ -254,33 +264,33 @@
   </div>
 
   <ul id="gulu" class="audio-list active" role="tabpanel" tabindex="0">
-    <li class="audio-item" role="button" tabindex="0" data-src="buyaohaipaikunnan.mp3">不要害怕困难</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="dongrizhufu.mp3">冬日祝福</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="ge-ye-xihuan-ni.mp3">哥也喜欢你</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="cuini_rushui.mp3">催你入睡</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="jiedianhua.mp3">接电话</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="jiejie.mp3">姐姐</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="meimei-wanan .mp3">妹妹晚安</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="taiyangshai_pigu.mp3">太阳晒屁股</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="qichuang_naoling_shengri.mp3">起床闹铃（生日版）</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="sajiaobalian.mp3">撒娇八连</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="shengri_duxin.mp3">生日读信</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="women_haohui_zai_jian_men.mp3">我们还会再见面的</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="jiejie_zaodian_shuijiao_ba.mp3">姐姐早点睡觉吧</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="xin_de_yinian_xiwang.mp3">新的一年希望明年要比今年更开心一点</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="zaijianchi_yixia_rensheng_gaoguang.mp3">再坚持一下我的人生高光就来了</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="mama_wanan.mp3">妈妈晚安</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/buyaohaipaikunnan.mp3">不要害怕困难</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/dongrizhufu.mp3">冬日祝福</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/ge-ye-xihuan-ni.mp3">哥也喜欢你</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/cuini_rushui.mp3">催你入睡</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiedianhua.mp3">接电话</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiejie.mp3">姐姐</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/meimei-wanan.mp3">妹妹晚安</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/taiyangshai_pigu.mp3">太阳晒屁股</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/qichuang_naoling_shengri.mp3">起床闹铃（生日版）</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/sajiaobalian.mp3">撒娇八连</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/shengri_duxin.mp3">生日读信</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/women_haohui_zai_jian_men.mp3">我们还会再见面的</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/jiejie_zaodian_shuijiao_ba.mp3">姐姐早点睡觉吧</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/xin_de_yinian_xiwang.mp3">新的一年希望明年要比今年更开心一点</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/zaijianchi_yixia_rensheng_gaoguang.mp3">再坚持一下我的人生高光就来了</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/mama_wanan.mp3">妈妈晚安</li>
   </ul>
 
   <ul id="changge" class="audio-list" role="tabpanel" tabindex="0" hidden>
-    <li class="audio-item" role="button" tabindex="0" data-src="siyishenghua_live.mp3">肆意生花片段（直播版）</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="tebie_de_ren.mp3">特别的人</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="tuheisu.mp3">褪黑素</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/siyishenghua_live.mp3">肆意生花片段（直播版）</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/tebie_de_ren.mp3">特别的人</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/tuheisu.mp3">褪黑素</li>
   </ul>
 
   <ul id="jiangshu" class="audio-list" role="tabpanel" tabindex="0" hidden>
-    <li class="audio-item" role="button" tabindex="0" data-src="xiaoshuimian.mp3">小睡眠</li>
-    <li class="audio-item" role="button" tabindex="0" data-src="xiaoyu_youdao_dahaili_le_ma.mp3">小鱼游到大海里了吗</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/xiaoshuimian.mp3">小睡眠</li>
+    <li class="audio-item" role="button" tabindex="0" data-src="audios/xiaoyu_youdao_dahaili_le_ma.mp3">小鱼游到大海里了吗</li>
   </ul>
 </main>
 
@@ -296,9 +306,12 @@
   const playPauseBtn = document.getElementById("playPause");
   const prevBtn = document.getElementById("prev");
   const nextBtn = document.getElementById("next");
-  const randomBtn = document.getElementById("random");
+  const loopBtn = document.getElementById("loopBtn");
 
   let currentIndex = -1;
+  let playMode = 0; // 0=单次，1=列表，2=循环
+  const playModeIcons = ['⏹️', '📃', '🔁'];
+  const playModeTitles = ['播放模式：单次播放', '播放模式：列表播放', '播放模式：循环播放'];
 
   // 切换标签
   tabs.forEach(tab => {
@@ -369,7 +382,7 @@
   // 绑定音频列表事件
   function bindListEvents() {
     const allItems = document.querySelectorAll(".audio-item");
-    allItems.forEach((item, idx) => {
+    allItems.forEach((item) => {
       item.addEventListener("click", () => {
         const parentList = item.closest(".audio-list");
         if (!parentList.classList.contains("active")) return;
@@ -417,16 +430,11 @@
     playAudio(currentIndex + 1);
   });
 
-  // 随机播放按钮
-  randomBtn.addEventListener("click", () => {
-    const currentList = document.querySelector(".audio-list.active");
-    const items = currentList.querySelectorAll(".audio-item");
-    if (items.length === 0) return;
-    let randIndex = Math.floor(Math.random() * items.length);
-    while (randIndex === currentIndex && items.length > 1) {
-      randIndex = Math.floor(Math.random() * items.length);
-    }
-    playAudio(randIndex);
+  // 播放模式切换按钮
+  loopBtn.addEventListener("click", () => {
+    playMode = (playMode + 1) % 3;
+    loopBtn.textContent = playModeIcons[playMode];
+    loopBtn.setAttribute("aria-label", playModeTitles[playMode]);
   });
 
   // 播放进度更新
@@ -443,9 +451,34 @@
     audio.currentTime = progress.value;
   });
 
-  // 自动播放下一首
+  // 自动播放下一首根据播放模式
   audio.addEventListener("ended", () => {
-    playAudio(currentIndex + 1);
+    if (playMode === 0) {
+      // 单次播放，播放完暂停
+      playPauseBtn.textContent = "▶️";
+      playPauseBtn.setAttribute("aria-label", "播放");
+      clearActiveAudioItems();
+      nowPlaying.textContent = "未播放";
+      currentIndex = -1;
+      audio.src = "";
+    } else if (playMode === 1) {
+      // 列表播放，播完下一首，播到末尾停
+      const currentList = document.querySelector(".audio-list.active");
+      const items = currentList.querySelectorAll(".audio-item");
+      if (currentIndex < items.length - 1) {
+        playAudio(currentIndex + 1);
+      } else {
+        playPauseBtn.textContent = "▶️";
+        playPauseBtn.setAttribute("aria-label", "播放");
+        clearActiveAudioItems();
+        nowPlaying.textContent = "未播放";
+        currentIndex = -1;
+        audio.src = "";
+      }
+    } else {
+      // 循环播放
+      playAudio(currentIndex + 1);
+    }
   });
 
   // 时间格式化
@@ -454,6 +487,10 @@
     const s = Math.floor(seconds % 60);
     return `${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
   }
+
+  // 初始化播放模式按钮
+  loopBtn.textContent = playModeIcons[playMode];
+  loopBtn.setAttribute("aria-label", playModeTitles[playMode]);
 
   bindListEvents();
 </script>

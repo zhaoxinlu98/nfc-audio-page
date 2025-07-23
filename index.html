@@ -1,198 +1,398 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>极速小鱼 - 音频播放器</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #D7EEF6;
-      margin: 0;
-      padding: 0;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>极速小鱼 - 音频播放器</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap');
+
+  body {
+    font-family: 'Source Sans Pro', sans-serif;
+    background: linear-gradient(135deg, #D7EEF6 0%, #B7DFF8 100%);
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  header {
+    background-color: #18B7F6;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 3px 6px rgba(24,183,246,0.6);
+  }
+  header::before {
+    content: "🐟 ";
+  }
+  #player {
+    background: #fff;
+    padding: 12px 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    position: sticky;
+    top: 72px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px;
+    margin: 8px 12px;
+    user-select: none;
+  }
+  #tabs {
+    display: flex;
+    justify-content: center;
+    background-color: #ffffffdd;
+    border-bottom: 2px solid #ccc;
+    margin: 0 12px 24px 12px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .tab {
+    padding: 15px 28px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    outline: none;
+    color: #555;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .tab:hover:not(.active) {
+    color: #18B7F6;
+  }
+  .tab.active {
+    color: #666BCE;
+    font-weight: 700;
+  }
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 20%;
+    width: 60%;
+    height: 4px;
+    background: #666BCE;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+  .audio-list {
+    display: none;
+    padding: 20px 16px;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #ffffffcc;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 0 15px rgba(102,107,206,0.12);
+    margin: 0 12px 40px 12px;
+  }
+  .audio-list.active {
+    display: block;
+  }
+  .audio-item {
+    margin: 10px 0;
+    background-color: #D7EEF6;
+    padding: 14px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    color: #2c3e50;
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.15s ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+  }
+  .audio-item:hover:not(.active) {
+    background-color: #B0DFFC;
+    box-shadow: 0 6px 12px rgba(24,183,246,0.35);
+    transform: translateY(-2px);
+  }
+  .audio-item.active {
+    background-color: #666BCE;
+    color: white;
+    box-shadow: 0 0 18px #5559b8;
+    animation: pulseGlow 2s infinite alternate ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0% {
+      box-shadow: 0 0 8px #666BCE;
     }
-    header {
-      background-color: #18B7F6;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+    100% {
+      box-shadow: 0 0 18px #666BCE;
     }
-    header::before {
-      content: "🐟 ";
-    }
+  }
+  .controls button {
+    margin: 0 12px;
+    padding: 8px 14px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s ease-in-out, background-color 0.3s;
+    border: none;
+    background: #18B7F6;
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(24,183,246,0.7);
+    user-select: none;
+  }
+  .controls button:hover {
+    background: #137abf;
+    transform: scale(1.12);
+    box-shadow: 0 6px 16px rgba(19,122,191,0.9);
+  }
+  .controls button:active {
+    transform: scale(0.95);
+  }
+  .progress-container {
+    flex: 1;
+    margin: 0 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  #nowPlaying {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 18px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #progress {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: #d0d0d0;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  #progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #666BCE;
+    cursor: pointer;
+    box-shadow: 0 0 8px #666BCE;
+    transition: background-color 0.3s;
+  }
+  #progress::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #666BCE;
+    cursor: pointer;
+    box-shadow: 0 0 8px #666BCE;
+  }
+  #progress:hover {
+    background-color: #b0c8f9;
+  }
+  #progress:active::-webkit-slider-thumb {
+    background-color: #5559b8;
+  }
+  #time {
+    font-size: 13px;
+    color: #666;
+    margin-top: 6px;
+    text-align: right;
+    user-select: none;
+  }
+
+  /* 响应式 - 手机屏幕调整 */
+  @media (max-width: 600px) {
     #player {
-      background: #ffffff;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 72px;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 10px;
+      top: 56px;
+      margin: 8px 8px;
     }
     #tabs {
-      display: flex;
-      justify-content: center;
-      background-color: #ffffff;
-      border-bottom: 2px solid #ccc;
+      flex-wrap: wrap;
+      margin: 0 8px 20px 8px;
     }
     .tab {
-      padding: 15px 30px;
-      cursor: pointer;
-      background: none;
-      border: none;
+      padding: 10px 12px;
       font-size: 16px;
-      outline: none;
-    }
-    .tab.active {
-      border-bottom: 3px solid #666BCE;
-      color: #666BCE;
-      font-weight: bold;
+      flex: 1 1 33%;
+      text-align: center;
     }
     .audio-list {
-      display: none;
-      padding: 20px;
-    }
-    .audio-list.active {
-      display: block;
+      max-height: 260px;
+      margin: 0 8px 30px 8px;
+      padding: 15px;
     }
     .audio-item {
-      margin: 10px 0;
-      background-color: #D7EEF6;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .audio-item.active {
-      background-color: #666BCE;
-      color: white;
+      font-size: 14px;
+      padding: 12px 16px;
     }
     .controls button {
-      margin: 0 10px;
-      padding: 5px 10px;
+      font-size: 16px;
+      padding: 8px 10px;
+      margin: 0 8px;
+    }
+    #nowPlaying {
       font-size: 16px;
     }
-    .progress-container {
-      flex: 1;
-      margin: 0 10px;
-    }
-    #progress {
-      width: 100%;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <header>极速小鱼</header>
-  <div id="player">
-    <button id="prev">⏮️</button>
-    <div class="progress-container">
-      <div id="nowPlaying">未播放</div>
-      <input type="range" id="progress" value="0" />
-    </div>
-    <button id="next">⏭️</button>
-    <button id="random">🔀</button>
+<header>极速小鱼</header>
+<div id="player" class="controls" role="region" aria-label="音频播放器控制区">
+  <button id="prev" aria-label="上一首">⏮️</button>
+  <div class="progress-container">
+    <div id="nowPlaying" aria-live="polite" aria-atomic="true" aria-owns="progress">未播放</div>
+    <input type="range" id="progress" value="0" aria-label="播放进度" />
+    <div id="time" aria-live="polite" aria-atomic="true">00:00 / 00:00</div>
   </div>
+  <button id="next" aria-label="下一首">⏭️</button>
+  <button id="random" aria-label="随机播放">🔀</button>
+</div>
 
-  <div id="tabs">
-    <button class="tab active" data-tab="gululu">小鱼咕噜</button>
-    <button class="tab" data-tab="sing">小鱼唱歌</button>
-    <button class="tab" data-tab="story">小鱼讲故事</button>
-  </div>
+<div id="tabs" role="tablist" aria-label="音频模块切换">
+  <button class="tab active" data-tab="gululu" role="tab" aria-selected="true" tabindex="0" aria-controls="gululu">小鱼咕噜</button>
+  <button class="tab" data-tab="sing" role="tab" aria-selected="false" tabindex="-1" aria-controls="sing">小鱼唱歌</button>
+  <button class="tab" data-tab="story" role="tab" aria-selected="false" tabindex="-1" aria-controls="story">小鱼讲故事</button>
+</div>
 
-  <div id="gululu" class="audio-list active">
-    <div class="audio-item" data-src="buyaohaipaikunnan.mp3">不要害怕困难</div>
-    <div class="audio-item" data-src="dongrizhufu.mp3">冬日祝福</div>
-    <div class="audio-item" data-src="ge-ye-xihuan-ni.mp3">哥也喜欢你</div>
-    <div class="audio-item" data-src="cuini_rushui.mp3">催你入睡</div>
-    <div class="audio-item" data-src="jiedianhua.mp3">接电话</div>
-    <div class="audio-item" data-src="jiejie.mp3">姐姐</div>
-    <div class="audio-item" data-src="meimei-wanan .mp3">妹妹晚安</div>
-    <div class="audio-item" data-src="taiyangshai_pigu.mp3">太阳晒屁股</div>
-    <div class="audio-item" data-src="qichuang_naoling_shengri.mp3">起床闹铃（生日版）</div>
-    <div class="audio-item" data-src="sajiaobalian.mp3">撒娇八连</div>
-    <div class="audio-item" data-src="shengri_duxin.mp3">生日读信</div>
-    <div class="audio-item" data-src="women_haohui_zai_jian_men.mp3">我们还会再见面的</div>
-    <div class="audio-item" data-src="jiejie_zaodian_shuijiao_ba.mp3">姐姐早点睡觉吧</div>
-    <div class="audio-item" data-src="xin_de_yinian_xiwang.mp3">新的一年希望明年要比今年更开心一点</div>
-    <div class="audio-item" data-src="zaijianchi_yixia_rensheng_gaoguang.mp3">再坚持一下我的人生高光就来了</div>
-    <div class="audio-item" data-src="mama_wanan.mp3">妈妈晚安</div>
-  </div>
+<div id="gululu" class="audio-list active" role="tabpanel" tabindex="0" aria-labelledby="gululu" >
+  <div class="audio-item" data-src="buyaohaipaikunnan.mp3" tabindex="0">不要害怕困难</div>
+  <div class="audio-item" data-src="dongrizhufu.mp3" tabindex="0">冬日祝福</div>
+  <div class="audio-item" data-src="ge-ye-xihuan-ni.mp3" tabindex="0">哥也喜欢你</div>
+  <div class="audio-item" data-src="cuini_rushui.mp3" tabindex="0">催你入睡</div>
+  <div class="audio-item" data-src="jiedianhua.mp3" tabindex="0">接电话</div>
+  <div class="audio-item" data-src="jiejie.mp3" tabindex="0">姐姐</div>
+  <div class="audio-item" data-src="meimei-wanan .mp3" tabindex="0">妹妹晚安</div>
+  <div class="audio-item" data-src="taiyangshai_pigu.mp3" tabindex="0">太阳晒屁股</div>
+  <div class="audio-item" data-src="qichuang_naoling_shengri.mp3" tabindex="0">起床闹铃（生日版）</div>
+  <div class="audio-item" data-src="sajiaobalian.mp3" tabindex="0">撒娇八连</div>
+  <div class="audio-item" data-src="shengri_duxin.mp3" tabindex="0">生日读信</div>
+  <div class="audio-item" data-src="women_haohui_zai_jian_men.mp3" tabindex="0">我们还会再见面的</div>
+  <div class="audio-item" data-src="jiejie_zaodian_shuijiao_ba.mp3" tabindex="0">姐姐早点睡觉吧</div>
+  <div class="audio-item" data-src="xin_de_yinian_xiwang.mp3" tabindex="0">新的一年希望明年要比今年更开心一点</div>
+  <div class="audio-item" data-src="zaijianchi_yixia_rensheng_gaoguang.mp3" tabindex="0">再坚持一下我的人生高光就来了</div>
+  <div class="audio-item" data-src="mama_wanan.mp3" tabindex="0">妈妈晚安</div>
+</div>
 
-  <div id="sing" class="audio-list">
-    <div class="audio-item" data-src="siyishenghua_live.mp3">肆意生花片段（直播版）</div>
-    <div class="audio-item" data-src="tebie_de_ren.mp3">特别的人</div>
-    <div class="audio-item" data-src="tuheisu.mp3">褪黑素</div>
-  </div>
+<div id="sing" class="audio-list" role="tabpanel" tabindex="0" aria-labelledby="sing" hidden>
+  <div class="audio-item" data-src="siyishenghua_live.mp3" tabindex="0">肆意生花片段（直播版）</div>
+  <div class="audio-item" data-src="tebie_de_ren.mp3" tabindex="0">特别的人</div>
+  <div class="audio-item" data-src="tuheisu.mp3" tabindex="0">褪黑素</div>
+</div>
 
-  <div id="story" class="audio-list">
-    <div class="audio-item" data-src="xiaoshuimian.mp3">小睡眠</div>
-    <div class="audio-item" data-src="xiaoyu_youdao_dahaili_le_ma.mp3">小鱼游到大海里了吗</div>
-  </div>
+<div id="story" class="audio-list" role="tabpanel" tabindex="0" aria-labelledby="story" hidden>
+  <div class="audio-item" data-src="xiaoshuimian.mp3" tabindex="0">小睡眠</div>
+  <div class="audio-item" data-src="xiaoyu_youdao_dahaili_le_ma.mp3" tabindex="0">小鱼游到大海里了吗</div>
+</div>
 
-  <audio id="audio" controls hidden></audio>
+<audio id="audio" controls hidden></audio>
 
-  <script>
-    const audio = document.getElementById("audio");
-    const nowPlaying = document.getElementById("nowPlaying");
-    const progress = document.getElementById("progress");
-    const prevBtn = document.getElementById("prev");
-    const nextBtn = document.getElementById("next");
-    const randomBtn = document.getElementById("random");
-    const tabs = document.querySelectorAll(".tab");
-    const lists = document.querySelectorAll(".audio-list");
-    let playlist = [];
-    let currentIndex = -1;
+<script>
+  const audio = document.getElementById("audio");
+  const nowPlaying = document.getElementById("nowPlaying");
+  const progress = document.getElementById("progress");
+  const timeDisplay = document.getElementById("time");
+  const prevBtn = document.getElementById("prev");
+  const nextBtn = document.getElementById("next");
+  const randomBtn = document.getElementById("random");
+  const tabs = document.querySelectorAll(".tab");
+  const lists = document.querySelectorAll(".audio-list");
+  let currentIndex = -1;
 
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        tabs.forEach(t => t.classList.remove("active"));
-        lists.forEach(list => list.classList.remove("active"));
-        tab.classList.add("active");
-        document.getElementById(tab.dataset.tab).classList.add("active");
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => {
+        t.classList.remove("active");
+        t.setAttribute("aria-selected", "false");
+        t.tabIndex = -1;
       });
+      lists.forEach(list => {
+        list.classList.remove("active");
+        list.hidden = true;
+      });
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      tab.tabIndex = 0;
+      const tabPanel = document.getElementById(tab.dataset.tab);
+      tabPanel.classList.add("active");
+      tabPanel.hidden = false;
+
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = "";
+      nowPlaying.textContent = "未播放";
+      timeDisplay.textContent = "00:00 / 00:00";
+
+      const firstAudio = tabPanel.querySelector(".audio-item");
+      if (firstAudio) firstAudio.focus();
+
+      currentIndex = -1;
     });
+  });
 
-    function playAudio(index) {
-      const items = document.querySelectorAll(".audio-list.active .audio-item");
-      if (index < 0 || index >= items.length) return;
-      items.forEach(i => i.classList.remove("active"));
-      const item = items[index];
-      item.classList.add("active");
-      const src = item.dataset.src;
-      nowPlaying.textContent = item.textContent;
-      audio.src = src;
-      audio.play();
-      currentIndex = index;
-    }
+  function playAudio(index) {
+    const items = document.querySelectorAll(".audio-list.active .audio-item");
+    if (index < 0 || index >= items.length) return;
+    items.forEach(i => i.classList.remove("active"));
+    const item = items[index];
+    item.classList.add("active");
+    const src = item.dataset.src;
+    nowPlaying.textContent = item.textContent;
+    audio.src = src;
+    audio.play();
+    currentIndex = index;
+  }
 
-    document.querySelectorAll(".audio-item").forEach((item, i) => {
-      item.addEventListener("click", () => {
+  document.querySelectorAll(".audio-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const list = Array.from(item.parentNode.children);
+      currentIndex = list.indexOf(item);
+      playAudio(currentIndex);
+    });
+    item.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
         const list = Array.from(item.parentNode.children);
         currentIndex = list.indexOf(item);
         playAudio(currentIndex);
-      });
+      }
     });
+  });
 
-    prevBtn.onclick = () => playAudio(currentIndex - 1);
-    nextBtn.onclick = () => playAudio(currentIndex + 1);
-    randomBtn.onclick = () => {
-      const items = document.querySelectorAll(".audio-list.active .audio-item");
-      const rand = Math.floor(Math.random() * items.length);
-      playAudio(rand);
-    };
+  prevBtn.onclick = () => playAudio(currentIndex - 1);
+  nextBtn.onclick = () => playAudio(currentIndex + 1);
+  randomBtn.onclick = () => {
+    const items = document.querySelectorAll(".audio-list.active .audio-item");
+    const rand = Math.floor(Math.random() * items.length);
+    playAudio(rand);
+  };
 
-    audio.addEventListener("timeupdate", () => {
+  audio.addEventListener("timeupdate", () => {
+    if (audio.duration) {
       progress.value = (audio.currentTime / audio.duration) * 100;
-    });
+      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    }
+  });
 
-    progress.addEventListener("input", () => {
+  progress.addEventListener("input", () => {
+    if (audio.duration) {
       audio.currentTime = (progress.value / 100) * audio.duration;
-    });
-  </script>
+    }
+  });
+</script>
 </body>
 </html>

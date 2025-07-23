@@ -2,122 +2,515 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>极速小鱼 - 音频空间</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <title>极速小鱼播放器 - 带控制按钮与自定义进度条</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg-color: #f0f0f0;
-      --text-color: #333;
-      --card-bg: #ffffffcc;
-      --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-    body.dark {
-      --bg-color: #1a1a1a;
-      --text-color: #f5f5f5;
-      --card-bg: #2b2b2bcc;
-      --shadow: rgba(0, 0, 0, 0.5);
+      --bg-color: #D7EEF6;
+      --card-color: #ffffff;
+      --text-color: #1a1a1a;
+      --accent-color: #18B7F6;
+      --accent-hover: #139bd7;
+      --progress-bg: #cbe9f9;
+      --progress-fill: #18B7F6;
     }
 
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: var(--bg-color);
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
       color: var(--text-color);
-      padding: 30px;
-      transition: background 0.3s ease, color 0.3s ease;
+      transition: background-color 0.4s, color 0.4s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    h2 {
-      text-align: center;
-      font-size: 2rem;
-      margin-bottom: 30px;
+    header {
+      background-color: var(--card-color);
+      padding: 1rem 1.5rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      user-select: none;
     }
 
     .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #888;
+      background-color: var(--accent-color);
+      color: white;
       border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
-      color: #fff;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 10px var(--shadow);
-      transition: background 0.3s ease;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+      user-select: none;
     }
 
     .theme-toggle:hover {
-      background: #555;
+      background-color: var(--accent-hover);
+    }
+
+    main {
+      flex-grow: 1;
+      max-width: 900px;
+      margin: 1rem auto 2rem;
+      width: 90%;
+      padding-top: 170px; /* 给播放窗口留出空间 */
+    }
+
+    /* 播放窗口 固定且明显 */
+    .player {
+      background-color: var(--card-color);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 999;
+      user-select: none;
+    }
+
+    .player .title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--accent-color);
+      text-align: center;
+      user-select: text;
+    }
+
+    /* 自定义音频控件 */
+    audio {
+      width: 100%;
+      outline: none;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      appearance: none;
+      background: var(--progress-bg);
+      height: 10px;
+      cursor: pointer;
+      margin: 0.5rem 0 0;
+      -webkit-appearance: none;
+    }
+    audio::-webkit-media-controls-panel {
+      display: none !important;
+    }
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-volume-slider {
+      display: none !important;
+    }
+
+    /* 自定义进度条 */
+    audio::-webkit-slider-runnable-track {
+      height: 10px;
+      background: var(--progress-bg);
+      border-radius: 5px;
+    }
+    audio::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      cursor: pointer;
+      margin-top: -3px;
+      box-shadow: 0 0 6px rgba(24,183,246,0.8);
+      transition: background-color 0.3s;
+    }
+    audio::-webkit-slider-thumb:hover {
+      background: var(--accent-hover);
+    }
+
+    /* 模块Tab导航 */
+    .modules-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      user-select: none;
+    }
+
+    .modules-nav button {
+      background-color: var(--card-color);
+      border: 2px solid var(--accent-color);
+      color: var(--accent-color);
+      font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+      font-size: 1rem;
+      min-width: 140px;
+      white-space: nowrap;
+    }
+
+    .modules-nav button[aria-selected="true"],
+    .modules-nav button:hover {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    /* 音频列表 */
+    .audio-list {
+      background-color: var(--card-color);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      max-height: 350px;
+      overflow-y: auto;
+      outline: none;
     }
 
     .audio-item {
-      background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      padding: 20px;
-      border-radius: 15px;
-      margin: 20px auto;
-      max-width: 360px;
-      box-shadow: 0 8px 16px var(--shadow);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      background-color: #f4faff;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--accent-color);
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
     }
 
-    .audio-item:hover {
-      box-shadow: 0 12px 24px var(--shadow);
-    }
-
-    .audio-item p {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-    }
-
-    audio {
-      width: 100%;
-      border-radius: 10px;
+    /* 选中音频的颜色改为 #18B7F6 */
+    .audio-item:hover,
+    .audio-item.selected,
+    .audio-item:focus-visible {
+      background-color: #18B7F6;
+      color: white;
+      box-shadow: 0 2px 12px rgba(24, 183, 246, 0.6);
       outline: none;
+    }
+
+    /* 播放控制按钮容器 */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.3rem;
+      user-select: none;
+    }
+
+    .controls button {
+      background-color: var(--accent-color);
+      border: none;
+      color: white;
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .controls button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* 响应式 */
+    @media (max-width: 600px) {
+      .modules-nav {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+      .modules-nav button {
+        min-width: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">切换主题</button>
-  <h2>🎵 极速小鱼 · 音频空间</h2>
+  <header>
+    <h1>🐟 极速小鱼</h1>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">切换主题</button>
+  </header>
 
-  <div class="audio-item">
-    <p>🥺 哥也喜欢你</p>
-    <audio controls>
-      <source src="ge-ye-xihuan-ni.m4a" type="audio/mp4" />
-    </audio>
+  <div class="player" role="region" aria-label="当前播放音频">
+    <div class="title" id="current-title" tabindex="0">请选择音频播放</div>
+    <audio id="audio-player" preload="metadata"></audio>
+    <div class="controls">
+      <button id="prev-btn" aria-label="上一首">上一首</button>
+      <button id="play-pause-btn" aria-label="播放/暂停">播放</button>
+      <button id="next-btn" aria-label="下一首">下一首</button>
+      <button id="shuffle-btn" aria-pressed="false" aria-label="随机播放">随机播放</button>
+    </div>
   </div>
 
-  <div class="audio-item">
-    <p>🌙 妹妹晚安</p>
-    <audio controls>
-      <source src="meimei-wanan.m4a" type="audio/mp4" />
-    </audio>
-  </div>
+  <main>
+    <nav class="modules-nav" role="tablist" aria-label="音频模块切换">
+      <button role="tab" aria-selected="true" tabindex="0" data-module="gululu" id="tab-gululu">🐠 小鱼咕噜</button>
+      <button role="tab" aria-selected="false" tabindex="-1" data-module="sing" id="tab-sing">🎤 小鱼唱歌</button>
+      <button role="tab" aria-selected="false" tabindex="-1" data-module="story" id="tab-story">📖 小鱼讲故事</button>
+    </nav>
 
-  <div class="audio-item">
-    <p>🌞 起床晒屁股啦！</p>
-    <audio controls>
-      <source src="qichuang-shai-pigu.m4a" type="audio/mp4" />
-    </audio>
-  </div>
+    <section
+      class="audio-list"
+      id="audio-list"
+      role="tabpanel"
+      tabindex="0"
+      aria-labelledby="tab-gululu"
+      aria-live="polite"
+    >
+      <!-- 动态内容 -->
+    </section>
+  </main>
 
-  <script>
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-    }
+<script>
+  const modules = {
+    gululu: [
+      { title: '不要害怕困难', src: 'buyaohaipaikunnan.mp3', type: 'audio/mpeg' },
+      { title: '冬日祝福', src: 'dongrizhufu.mp3', type: 'audio/mpeg' },
+      { title: '哥也喜欢你', src: 'ge-ye-xihuan-ni.m4a', type: 'audio/mp4' },
+      { title: '催你入睡', src: 'cuini_rushui.mp3', type: 'audio/mpeg' },
+      { title: '接电话', src: 'jiedianhua.mp3', type: 'audio/mpeg' },
+      { title: '姐姐', src: 'jiejie.mp3', type: 'audio/mpeg' },
+      { title: '妹妹晚安', src: 'meimei-wanan.m4a', type: 'audio/mp4' },
+      { title: '太阳晒屁股', src: 'taiyangshai_pigu.mp3', type: 'audio/mpeg' },
+      { title: '起床闹铃（生日版）', src: 'qichuang_naoling_shengri.mp3', type: 'audio/mpeg' },
+      { title: '撒娇八连', src: 'sajiaobalian.mp3', type: 'audio/mpeg' },
+      { title: '生日读信', src: 'shengri_duxin.mp3', type: 'audio/mpeg' },
+      { title: '我们还会再见面的', src: 'women_haohui_zai_jian_men.mp3', type: 'audio/mpeg' },
+      { title: '姐姐早点睡觉吧', src: 'jiejie_zaodian_shuijiao_ba.mp3', type: 'audio/mpeg' },
+      { title: '新的一年希望明年要比今年更开心一点', src: 'xin_de_yinian_xiwang.mp3', type: 'audio/mpeg' },
+      { title: '再坚持一下我的人生高光就来了', src: 'zaijianchi_yixia_rensheng_gaoguang.mp3', type: 'audio/mpeg' },
+      { title: '妈妈晚安', src: 'mama_wanan.mp3', type: 'audio/mpeg' }
+    ],
+    sing: [
+      { title: '肆意生花片段（直播版）', src: 'siyishenghua_live.mp3', type: 'audio/mpeg' },
+      { title: '特别的人', src: 'tebie_de_ren.mp3', type: 'audio/mpeg' },
+      { title: '褪黑素', src: 'tuheisu.mp3', type: 'audio/mpeg' }
+    ],
+    story: [
+      { title: '小睡眠', src: 'xiaoshuimian.mp3', type: 'audio/mpeg' },
+      { title: '小鱼游到大海里了吗', src: 'xiaoyu_youdao_dahaili_le_ma.mp3', type: 'audio/mpeg' }
+    ]
+  };
 
-    // 初始化主题
-    (function () {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'dark') {
-        document.body.classList.add('dark');
+  const audioListElem = document.getElementById('audio-list');
+  const audioPlayer = document.getElementById('audio-player');
+  const currentTitle = document.getElementById('current-title');
+  const tabs = document.querySelectorAll('.modules-nav button');
+  const prevBtn = document.getElementById('prev-btn');
+  const playPauseBtn = document.getElementById('play-pause-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const shuffleBtn = document.getElementById('shuffle-btn');
+
+  let currentModule = 'gululu';
+  let currentAudioIndex = null;
+  let focusedAudioIndex = 0;
+  let isShuffle = false;
+
+  function switchModule(event) {
+    const clickedTab = event.currentTarget;
+
+    tabs.forEach(tab => {
+      tab.setAttribute('aria-selected', 'false');
+      tab.setAttribute('tabindex', '-1');
+    });
+    clickedTab.setAttribute('aria-selected', 'true');
+    clickedTab.setAttribute('tabindex', '0');
+    clickedTab.focus();
+
+    currentModule = clickedTab.getAttribute('data-module');
+    currentAudioIndex = null;
+    focusedAudioIndex = 0;
+    currentTitle.textContent = '请选择音频播放';
+    audioPlayer.pause();
+    audioPlayer.removeAttribute('src');
+    audioPlayer.load();
+
+    updateAriaControls();
+    renderAudioList();
+    updatePlayPauseButton();
+  }
+
+  function updateAriaControls() {
+    tabs.forEach(tab => {
+      const panelId = 'audio-list';
+      tab.setAttribute('aria-controls', panelId);
+    });
+    audioListElem.setAttribute('aria-labelledby', [...tabs].find(t => t.getAttribute('aria-selected') === 'true').id);
+  }
+
+  function renderAudioList() {
+    audioListElem.innerHTML = '';
+
+    modules[currentModule].forEach((audio, index) => {
+      const div = document.createElement('div');
+      div.className = 'audio-item';
+      div.textContent = audio.title;
+      div.setAttribute('tabindex', '-1');
+      div.setAttribute('role', 'button');
+      div.setAttribute('aria-pressed', 'false');
+
+      div.addEventListener('click', () => playAudio(index));
+      div.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          playAudio(index);
+        }
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          focusAudio((index + 1) % modules[currentModule].length);
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          focusAudio((index - 1 + modules[currentModule].length) % modules[currentModule].length);
+        }
+      });
+
+      if (index === currentAudioIndex) {
+        div.classList.add('selected');
+        div.setAttribute('aria-pressed', 'true');
       }
-    })();
-  </script>
+
+      audioListElem.appendChild(div);
+    });
+
+    focusAudio(focusedAudioIndex);
+  }
+
+  function playAudio(index) {
+    const audio = modules[currentModule][index];
+    if (!audio) return;
+    audioPlayer.src = audio.src;
+    audioPlayer.type = audio.type;
+    audioPlayer.play();
+
+    currentTitle.textContent = audio.title;
+    currentAudioIndex = index;
+    focusedAudioIndex = index;
+    updateSelectedAudio();
+    updatePlayPauseButton();
+  }
+
+  function updateSelectedAudio() {
+    const items = audioListElem.querySelectorAll('.audio-item');
+    items.forEach((item, i) => {
+      if (i === currentAudioIndex) {
+        item.classList.add('selected');
+        item.setAttribute('aria-pressed', 'true');
+      } else {
+        item.classList.remove('selected');
+        item.setAttribute('aria-pressed', 'false');
+      }
+    });
+  }
+
+  function focusAudio(index) {
+    const items = audioListElem.querySelectorAll('.audio-item');
+    if (items.length === 0) return;
+    if (index < 0) index = items.length -1;
+    if (index >= items.length) index = 0;
+
+    items.forEach(item => item.setAttribute('tabindex', '-1'));
+    items[index].setAttribute('tabindex', '0');
+    items[index].focus();
+    focusedAudioIndex = index;
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+  }
+
+  // 随机播放开关
+  shuffleBtn.addEventListener('click', () => {
+    isShuffle = !isShuffle;
+    shuffleBtn.setAttribute('aria-pressed', isShuffle.toString());
+    shuffleBtn.style.backgroundColor = isShuffle ? 'var(--accent-hover)' : 'var(--accent-color)';
+  });
+
+  // 获取下一首索引，支持随机播放
+  function getNextIndex() {
+    if (isShuffle) {
+      let nextIndex;
+      do {
+        nextIndex = Math.floor(Math.random() * modules[currentModule].length);
+      } while (nextIndex === currentAudioIndex && modules[currentModule].length > 1);
+      return nextIndex;
+    } else {
+      return (currentAudioIndex + 1) % modules[currentModule].length;
+    }
+  }
+
+  // 播放控制按钮事件
+  prevBtn.addEventListener('click', () => {
+    if (currentAudioIndex === null) return;
+    const prevIndex = (currentAudioIndex - 1 + modules[currentModule].length) % modules[currentModule].length;
+    playAudio(prevIndex);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (currentAudioIndex === null) return;
+    playAudio(getNextIndex());
+  });
+
+  playPauseBtn.addEventListener('click', () => {
+    if (!audioPlayer.src) return;
+    if (audioPlayer.paused) {
+      audioPlayer.play();
+    } else {
+      audioPlayer.pause();
+    }
+    updatePlayPauseButton();
+  });
+
+  audioPlayer.addEventListener('play', updatePlayPauseButton);
+  audioPlayer.addEventListener('pause', updatePlayPauseButton);
+
+  audioPlayer.addEventListener('ended', () => {
+    if (currentAudioIndex === null) return;
+    playAudio(getNextIndex());
+  });
+
+  function updatePlayPauseButton() {
+    playPauseBtn.textContent = audioPlayer.paused ? '播放' : '暂停';
+  }
+
+  // Tab键盘导航切换模块
+  tabs.forEach(tab => {
+    tab.addEventListener('click', switchModule);
+    tab.addEventListener('keydown', e => {
+      const currentIndex = [...tabs].findIndex(t => t.getAttribute('aria-selected') === 'true');
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % tabs.length;
+        tabs[nextIndex].click();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        tabs[prevIndex].click();
+      }
+    });
+  });
+
+  // 页面首次加载时渲染
+  window.addEventListener('load', () => {
+    renderAudioList();
+    updateAriaControls();
+  });
+</script>
 </body>
 </html>

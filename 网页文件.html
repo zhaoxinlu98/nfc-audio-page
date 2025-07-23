@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>音频选择页面</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f7f7f7;
+    }
+    .audio-item {
+      margin-bottom: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>请选择一个音频播放</h2>
+
+  <div class="audio-item">
+    <p>音频 1：大自然的声音</p>
+    <audio controls>
+      <source src="音频链接1.mp3" type="audio/mpeg">
+      您的浏览器不支持 audio 元素。
+    </audio>
+  </div>
+
+  <div class="audio-item">
+    <p>音频 2：舒缓钢琴曲</p>
+    <audio controls>
+      <source src="音频链接2.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="audio-item">
+    <p>音频 3：白噪音</p>
+    <audio controls>
+      <source src="音频链接3.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+</body>
+</html>
